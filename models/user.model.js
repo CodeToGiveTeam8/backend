@@ -53,11 +53,21 @@ module.exports = (sequelize,DataTypes) =>{
                 notEmpty : true,
             },
         },
-        profile_image_url : {
-            type : DataTypes.STRING,
+        photo : {
+            type : DataTypes.BLOB,
             allowNull : true,
+        },
+        mobile:{
+            type: DataTypes.STRING,
+            allowNull:true
+        },
+        name : {
+            type : DataTypes.STRING,
+            allowNull : false,
+            validate : {
+                notEmpty : true,
+            },
         }
-
     })
     return User
 }
