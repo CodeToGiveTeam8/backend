@@ -1,21 +1,29 @@
 const {promisify} = require('util');
-const { getQuery } = require("../models/dbConnection");
+const jwt = require('jsonwebtoken')
 
 const auth = async(req,res,next)=>{
-    if(req.cookies.jwt){
-        try{
-            const decoded = await promisify(jwt.verify)(req.cookies.jwt,process.env.JWT_SECRET);
-            req.user = getQuery("SELECT * FROM user WHERE id = ?",[decoded.id])[0];
-            return next();
-        }catch(e){
-            res.status(401).send("Unauthorized:No token provided");
-            console.error(err);
-            return next();
-        }
+    
+    const authHeader = req.headers['authorization']
+    const token = authHeader && authHeader.split(' ')[1]
 
-    }else{
-        next();
+    if (token==null){
+        res.status(401).json({
+            "msg" : "Unauthorized:No token provided"
+        });
+        return
     }
+    jwt.verify(token,process.env.JWT_SECRET,(err,data)=>{
+        if(err){
+            res.status(401).json({
+                "msg" : "Unauthorized:No token provided"
+            });
+            console.log(err)
+            return
+        }
+        req.userId = data.ID
+        req.email = data.email
+    })
+    return next()
 }
 
 module.exports =  {auth};
