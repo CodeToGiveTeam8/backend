@@ -40,7 +40,7 @@ module.exports = (sequelize,DataTypes) =>{
             validate : {
                 notEmpty : true,
                 customValidator(val) {
-                    if (val === null || (val!="GRASSROOT" && val!="CASE MANAGER" && val!="OPERATION")) {
+                    if (val === null || (val!="GRASSROOT" && val!="TEAM LEAD" && val!="OPERATION")) {
                       throw new Error('Invalid Role value');
                     }
                   }
