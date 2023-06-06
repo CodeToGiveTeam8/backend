@@ -10,7 +10,8 @@ const SaveUser = async(user) => {
       gender : user.gender,
       role : user.role,
       dob : user.dob,
-      profile_image_url : user.profile_image_url,
+      mobile:user.mobile,
+      photo : user.photo,
   }).then(function (users) {
       if (users) {
           return user
@@ -18,6 +19,7 @@ const SaveUser = async(user) => {
           return null
       }
   }).catch((err)=>{
+      console.log(err)
       return null
   });
   };
