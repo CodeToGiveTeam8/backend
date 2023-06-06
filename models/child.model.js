@@ -1,8 +1,12 @@
-const User = require("./user.model")
 module.exports = (sequelize,DataTypes) =>{
     const Child = sequelize.define("Child",{
+        childId : {
+            type : DataTypes.STRING,
+            primaryKey: true
+        },
         name : {
             type : DataTypes.STRING,
+            defaultValue: "UNKNOWN",
         },
         dob : {
             type : DataTypes.DATE,
@@ -19,14 +23,20 @@ module.exports = (sequelize,DataTypes) =>{
                   }
             },
         },
-        profile_image_url : {
-            type : DataTypes.STRING,
+        photo : {
+            type : DataTypes.BLOB,
+            allowNull : true,
         },
         category : {
             type : DataTypes.STRING,
             allowNull : false,
             validate : {
                 notEmpty : true,
+                customValidator(val) {
+                    if (val === null || (val!="ABANDONED" && val!="SURRENDERED" && val!="OTHER")) {
+                      throw new Error('Invalid Category Name');
+                    }
+                  }
             },
         },
         city : {
@@ -49,7 +59,13 @@ module.exports = (sequelize,DataTypes) =>{
             allowNull : false,
             validate : {
                 notEmpty : true,
+                customValidator(val) {
+                    if (val === null || (val!="NOT STARTED" && val!="DONE" && val!="WORKING")) {
+                      throw new Error('Invalid Status value');
+                    }
+                  }
             },
+            defaultValue: "NOT STARTED",
         },
         enrollment_date : {
             type : DataTypes.DATE,

@@ -1,7 +1,7 @@
-const {SaveUser,GetUserByEmail} = require("../models/user.repo")
+const {SaveUser,GetUserByEmail,GetGrassRootHome,GetTeamLeadHome} = require("../models/repo")
 
 const validateUser = (user)=>{
-    if( user.name.length==0 || user.password.length<=3 || user.gender.length==0 || user.email.length==0 || (user.role!="GRASSROOT" && user.role!="CASE MANAGER" && user.role!="OPERATION")){
+    if( user.name.length==0 || user.password.length<=3 || user.gender.length==0 || user.email.length==0 || (user.role!="GRASSROOT" && user.role!="TEAM LEAD" && user.role!="OPERATION")){
         return false
     }
     return true
@@ -25,4 +25,17 @@ const getUserByEmail = async(email)=>{
     return user
 }
 
-module.exports = {validateUser,saveUserService,checkValidUser,getUserByEmail}
+const getUserHomeDetails = async(user)=>{
+    if(user.role == "GRASSROOT"){
+        //get details only from his cases
+        childDetails = await GetGrassRootHome(user.id)
+        console.log(childDetails)
+        return childDetails
+    }else if(user.role == "TEAM LEAD"){
+        //get all data's
+        childDetails = await GetTeamLeadHome()
+        return childDetails
+    }
+}
+
+module.exports = {validateUser,saveUserService,checkValidUser,getUserByEmail,getUserHomeDetails}

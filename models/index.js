@@ -87,5 +87,4 @@ db.categoryProcess = CategoryProcess;
 db.processDocument = ProcessDocument;
 db.documentsUploaded = DocumentsUploaded;
 
-
 module.exports = db;
