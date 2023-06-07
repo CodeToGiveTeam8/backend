@@ -1,5 +1,6 @@
 const express = require("express");
 const {validateChild,saveChildService} =  require("../services/child.service");
+const {getOrphanageIdService} = require("../services/orphanage.service")
 const { auth } = require("../middlewares");
 
 const childRouter = express.Router();
@@ -13,10 +14,12 @@ childRouter.post("/child/add",auth,async(req,res)=>{
 
     if(validateChild(child)){
         child.UserId = req.userData.id
+        orphanageId = await getOrphanageIdService(child.orphanage)
+        child.OrphanageId = orphanageId
         child = await saveChildService(child)
         if(child==null){
             return res.status(400).json({
-                "msg" : "Child Already exist"
+                "msg" : "Error saving data"
             })
         }
         return res.status(200).json({

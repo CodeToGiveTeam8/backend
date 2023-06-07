@@ -3,7 +3,6 @@ module.exports = (sequelize,DataTypes) =>{
         category : {
             type : DataTypes.STRING,
             allowNull : false,
-            unique: true,
         },
         orderNo : {
             type : DataTypes.INTEGER,

@@ -47,6 +47,8 @@ const ProcessProgress = require("./process_progress.model.js")(sequelize, Sequel
 const CategoryProcess = require("./category_process.model.js")(sequelize, Sequelize)
 const ProcessDocument = require("./process_document.model.js")(sequelize, Sequelize)
 const DocumentsUploaded = require("./documents_uploaded.model.js")(sequelize, Sequelize)
+const SubProcess = require("./subprocess.model.js")(sequelize, Sequelize)
+const SubProcessProgress = require("./subprocess_progress.model.js")(sequelize, Sequelize)
 
 
 User.hasMany(Child)
@@ -62,7 +64,7 @@ User.hasOne(Team,{
   uniqueKey: "grassroot_user_fk",
 })
 
-Child.hasMany(Orphanage)
+Orphanage.hasOne(Child)
 
 Process.hasMany(ProcessProgress)
 Child.hasMany(ProcessProgress)
@@ -75,6 +77,14 @@ Child.hasMany(DocumentsUploaded)
 ProcessDocument.hasMany(DocumentsUploaded)
 Process.hasMany(DocumentsUploaded)
 
+Process.hasMany(SubProcess)
+
+ProcessProgress.hasMany(SubProcessProgress)
+Child.hasMany(SubProcessProgress)
+Process.hasMany(SubProcessProgress)
+SubProcess.hasMany(SubProcessProgress)
+
+
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
 db.user = User;
@@ -86,5 +96,7 @@ db.processProgress = ProcessProgress;
 db.categoryProcess = CategoryProcess;
 db.processDocument = ProcessDocument;
 db.documentsUploaded = DocumentsUploaded;
+db.subProcess = SubProcess
+db.subProcessProgress = SubProcessProgress
 
 module.exports = db;

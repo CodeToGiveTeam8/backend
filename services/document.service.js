@@ -1,11 +1,13 @@
 const { SaveProcessDocument } = require("../models/repo")
 
-const validateProcessDocument = async(data)=>{
-    if(!data.name){
-        return false
-    }
-    if(data.name.length==0){
-        return false
+const validateProcessDocuments = async(data)=>{
+    for(let pdoc of data){
+        if(!pdoc.name){
+            return false
+        }
+        if(pdoc.name.length==0){
+            return false
+        }
     }
     return true
 }
@@ -15,4 +17,4 @@ const saveProcessDocumentService = async(data)=>{
     return data
 }
 
-module.exports = { validateProcessDocument,saveProcessDocumentService }
+module.exports = { validateProcessDocuments,saveProcessDocumentService }

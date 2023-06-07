@@ -9,7 +9,7 @@ require('dotenv').config();
 const {auth} = require('./middlewares');
 
 //Routes
-const {userRouter,homeRouter,childRouter,processRouter} = require("./routes");
+const {userRouter,homeRouter,childRouter,processRouter, orphanageRouter} = require("./routes");
 
 //DB Models
 const db = require('./models')
@@ -27,6 +27,7 @@ app.use(userRouter);
 app.use(homeRouter);
 app.use(childRouter);
 app.use(processRouter);
+app.use(orphanageRouter)
 
 db.sequelize.sync().then((req)=>{
     app.listen(port,()=>{

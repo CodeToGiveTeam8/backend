@@ -33,7 +33,7 @@ module.exports = (sequelize,DataTypes) =>{
             validate : {
                 notEmpty : true,
                 customValidator(val) {
-                    if (val === null || (val!="ABANDONED" && val!="SURRENDERED" && val!="OTHER")) {
+                    if (val === null || (val!="ABANDONED" && val!="SURRENDERED" && val!="ORPHANED" && val!="CHILD ADMITTED IN CCI BY FAMILY")) {
                       throw new Error('Invalid Category Name');
                     }
                   }
