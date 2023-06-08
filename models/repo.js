@@ -24,10 +24,19 @@ const SaveUser = async(user) => {
   });
 };
 
+const GetTeamLeadByEmail = async(email)=>{
+    user = await db.user.findOne({ where: { email: email, role : "TEAM LEAD" } })
+    if (user === null) {
+        return null
+      } else {
+        return user.dataValues
+      }
+}
+
 const GetUserByEmail = async(email)=>{
     user = await db.user.findOne({ where: { email: email } })
     if (user === null) {
-        return false
+        return null
       } else {
         return user.dataValues
       }
@@ -40,6 +49,23 @@ const GetUserByID = async(id)=>{
       } else {
         return user
       }
+}
+
+const AddToTeam = async(teamLeadId,userId)=>{
+    console.log("Adding to team")
+    return await db.team.create({
+        managerId: teamLeadId,
+        grassrootId: userId,
+    }).then(function (teamData) {
+        if (teamData) {
+            return teamData
+        } else {
+            return null
+        }
+    }).catch((err)=>{
+        console.log(err)
+        return null
+    });
 }
 
 const GetOrphanageId = async(name)=>{
@@ -82,6 +108,14 @@ const GetTeamLeadHome = async()=>{
     if (childDetails === null) {
         return null
     } else {
+        for (let i = 0; i < childDetails.length; i++) {
+            userDetail = await GetUserByID(childDetails[i].UserId)
+            orphanageDetail = await GetOrphanageByName(childDetails[i].OrphanageId)
+            childDetails[i].dataValues.user_name = userDetail.name
+            childDetails[i].dataValues.user_email = userDetail.email
+            childDetails[i].dataValues.orphanage = orphanageDetail.name
+
+          }
         return childDetails
     }
 }
@@ -278,4 +312,325 @@ const GetSubProcessByID = async(processId) => {
     return res
 }
 
-module.exports = {SaveUser,GetUserByEmail,GetGrassRootHome,GetTeamLeadHome,SaveChild,SaveProcess,SaveProcessDocument,SaveCategoryProcess,SaveOrphanage,GetOrphanage,GetOrphanageId,SaveSubProcessService,GetCategoryProcess,GetProcessByID,GetSubProcessByID}
+const ChangeStatus = async(childId,Status)=>{
+    await db.child.findAll({
+        where: {
+            childId : childId,
+        },
+      })
+        .then((results) => {
+          // Update the column values by adding the previous value
+          results.forEach((row) => {
+            row.status = Status;
+            row.save();
+          });
+          console.log('Status Updated successfully.');
+        })
+        .catch((error) => {
+          console.error('Error:', error);
+        });
+}
+
+const ProcessProgressCheck = async(childId)=>{
+    
+    data = await db.processProgress.findAll({
+        where: {
+            ChildId : childId,
+        },
+      })
+        
+    return data
+}
+
+const GetPrevStatus = async(childId)=>{
+    data = await db.child.findOne({
+        where: {
+            childId : childId,
+        },
+      })
+
+    return data.dataValues.status
+}
+
+const GetNoOfProcessFromProcProg = async(childId)=>{
+    data = await db.processProgress.findAll({
+        where: {
+            ChildId : childId,
+            status : "DONE"
+        },
+      })
+
+    return data.length
+}
+
+const GetChildById = async(childId)=>{
+    data = await db.child.findOne({
+        where: {
+            childId : childId,
+        },
+      })
+
+    return data
+}
+
+const GetNoOfProcessFromCat = async(category)=>{
+    data = await db.categoryProcess.findAll({
+        where: {
+            category : category,
+        },
+      })
+
+    return data.length
+}
+
+const GetProcessProgress = async(child_id,process_id)=>{
+    data = await db.processProgress.findOne({
+        where: {
+            ChildId : child_id,
+            ProcessId : process_id
+        },
+      })
+    return data
+}
+
+const SaveProcessProg = async(data)=>{
+    return await db.processProgress.create({
+        ChildId: data.childId,
+        ProcessId: data.ProcessId,
+        status: data.status,
+        started_at : data.started_at,
+        completed_at : data.completed_at,
+        status : data.status,
+        comment : data.comment,
+    }).then(function (users) {
+        if (users) {
+            return user
+        } else {
+            return null
+        }
+    }).catch((err)=>{
+        console.log(err)
+        return null
+    });
+}
+
+const AddProcessProg = async(childId)=>{
+    child = await GetChildById(childId)
+    data = await GetCategoryProcess(child.category)
+
+    for(const process of data) {
+        process_id = process.ProcessId
+        proces_prog = await GetProcessProgress(childId,process_id)
+        if(proces_prog!=null && proces_prog.status!="DONE"){
+            break
+        }
+        if(proces_prog==null){
+            const currentDate = new Date().toLocaleDateString('en-GB', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+              });
+            
+            const [day, month, year] = currentDate.split('/');
+            const formattedDate = `${year}:${month}:${day}`;
+
+            n_process_prog = {
+                childId : childId,
+                ProcessId : process_id,
+                status : "NOT DONE",
+                started_at : formattedDate,
+            }
+
+            return await SaveProcessProg(n_process_prog)
+        }    
+
+    }
+
+    return null
+
+}
+
+const AddDocumentUploaded = async(data)=>{
+    currentDate = new Date().toLocaleDateString('en-GB', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+      });
+    
+    const [day, month, year] = currentDate.split('/');
+    const formattedDate = `${year}-${month}-${day}`;
+
+    currentDate = new Date()
+    const UpdateDate = currentDate.toISOString().slice(0, 19).replace('T', ' ')
+
+    doc_data = {
+        ChildId: data.ChildChildId,
+        ProcessId: data.ProcessId,
+        document_name: data.name,
+        updated_at : formattedDate
+    }
+
+    console.log(doc_data)
+    
+    return await db.sequelize.query(`INSERT INTO DocumentsUploadeds (id,document_name,createdAt,updatedAt,ChildId,ProcessId) VALUES (DEFAULT,'${doc_data.document_name}','${UpdateDate}','${UpdateDate}','${doc_data.ChildId}',${doc_data.ProcessId})`, {
+        logging: console.log,
+      })
+    
+    // return await db.documentsUploaded.create(doc_data).then(function (data) {
+    //     if (data) {
+    //         return data
+    //     } else {
+    //         return null
+    //     }
+    // }).catch((err)=>{
+    //     console.log(err)
+    //     return null
+    // });
+
+}
+
+const GetDocumentsUploaded = async(childId,processId)=>{
+    data = await db.documentsUploaded.findAll({
+        where: {
+            ChildId : childId,
+            ProcessId : processId
+        },
+      })
+    return data
+}
+
+const GetDocumentUploadedById = async(docId)=>{
+    console.log(docId)
+    data = await db.documentsUploaded.findOne({
+        where: {
+            id : docId,
+        },
+      })
+    return data
+}
+
+const DeleteDocumentUploaded = async(docId)=>{
+    data = await db.documentsUploaded.destroy({
+        where: {
+            id : docId,
+        },
+      })
+
+    return data
+}
+
+const DoneSubTask = async(data)=>{
+    console.log({
+        ChildId: data.ChildId,
+        ProcessId: data.ProcessId,
+        SubProcessId: data.SubProcessId
+    })
+    return await db.subProcessProgress.create({
+        ChildId: data.ChildId,
+        ProcessId: data.ProcessId,
+        SubProcessId: data.SubProcessId
+    }).then(function (data) {
+        if (data) {
+            return data
+        } else {
+            return null
+        }
+    }).catch((err)=>{
+        console.log(err)
+        return null
+    });
+}
+
+const DeleteSubTask = async(data)=>{
+    return await db.subProcessProgress.destroy({
+        ChildId: data.ChildChildId,
+        ProcessId: data.ProcessId,
+        SubProcessId: data.SubProcessId
+    }).then(function (data) {
+        if (data) {
+            return data
+        } else {
+            return null
+        }
+    }).catch((err)=>{
+        console.log(err)
+        return null
+    });
+}
+
+const GetSubProcessCount = async(ProcessId)=>{
+    data = await db.subProcess.findAll({
+        where: {
+            ProcessId : ProcessId,
+        },
+      })
+
+    return data.length
+}
+
+const GetSubProcessProgCount = async(ProcessId,ChildChildId)=>{
+    data = await db.subProcessProgress.findAll({
+        where: {
+            ProcessId : ProcessId,
+            ChildId : ChildChildId
+        },
+      })
+
+    return data.length
+}
+
+const GetProcessDocumentsCount = async(ProcessId)=>{
+    data = await db.processDocument.findAll({
+        where: {
+            ProcessId : ProcessId,
+        },
+      })
+
+    return data.length
+}
+
+const GetDocumentsUploadedCount = async(ProcessId,ChildChildId)=>{
+    data = await db.documentsUploaded.findAll({
+        where: {
+            ProcessId : ProcessId,
+            ChildId : ChildChildId
+        },
+      })
+
+    return data.length
+}
+
+const ChangeProgStatus = async(child_id,process_id)=>{
+    console.log({
+        ChildId : child_id,
+        ProcessId : process_id
+    })
+    await db.processProgress.findAll({
+        where: {
+            ChildId : child_id,
+            ProcessId : process_id
+        },
+      })
+        .then((results) => {
+          // Update the column values by adding the previous value
+          results.forEach((row) => {
+            row.status = "DONE";
+            row.save();
+          });
+          console.log('Status Updated successfully for process_prog.');
+        })
+        .catch((error) => {
+          console.error('Error:', error);
+        });
+
+    return data
+}
+
+module.exports = {SaveUser,GetUserByEmail,GetGrassRootHome,AddToTeam,
+    GetTeamLeadHome,SaveChild,SaveProcess,SaveProcessDocument,SaveCategoryProcess,
+    SaveOrphanage,GetOrphanage,GetOrphanageId,SaveSubProcessService,GetCategoryProcess,
+    GetProcessByID,GetSubProcessByID,ChangeStatus,ProcessProgressCheck,GetPrevStatus,
+    GetNoOfProcessFromProcProg,GetChildById,GetNoOfProcessFromCat,AddProcessProg,SaveProcessProg,
+    AddDocumentUploaded,GetDocumentsUploaded,GetDocumentUploadedById,DeleteDocumentUploaded,
+    DoneSubTask,DeleteSubTask,GetSubProcessCount,GetSubProcessProgCount,GetProcessDocumentsCount,
+    GetDocumentsUploadedCount,ChangeProgStatus,GetTeamLeadByEmail}

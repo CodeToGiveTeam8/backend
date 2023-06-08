@@ -1,0 +1,275 @@
+{
+    "process" : {
+        "name" : "Work on and complete documentation",
+        "description" : "Work on and complete documentation...."
+    },
+    "document" : [
+        {
+            "name" : "Certificate_1",
+            "description" : "certificate 1 as PDF"
+        },
+        {
+            "name" : "Certificate_2"
+        }
+    ],
+    "subprocess" : [
+        {
+            "name" : "Newspaper Publication"
+        },
+        {
+            "name" : "TV Telecasting"
+        },
+        {
+            "name" : "File Missing Compliant, if not already done"
+        },
+        {
+            "name" : "Final Police Report"
+        },
+        {
+            "name" : "Medical Report for age verification (if needed)"
+        },
+        {
+            "name" : "Social Investigation Report (if needed)"
+        }
+    ],
+    "category" : "ABANDONED",
+    "order_no" : 1
+}
+
+{
+    "process" : {
+        "name" : "Submit to CWC and get LFA",
+        "description" : "Submit to CWC and get LFA..."
+    },
+    "document" : [
+        {
+            "name" : "Certificate_1",
+            "description" : "certificate 1 as PDF"
+        }
+    ],
+    "subprocess" : [
+        {
+            "name" : "Submit the case to CWC for getting the legally free for adoption (LFA) certificate"
+        },
+        {
+            "name" : "CWC will issue the LFA to the CCI/SAA"
+        },
+        {
+            "name" : "Submit letter to DCPU to link the child to the relevant SAA"
+        }
+    ],
+    "category" : "ABANDONED",
+    "order_no" : 3
+}
+
+{
+    "process" : {
+    "name" : "Get child uploaded to Carings",
+    "description" : "Get child uploaded to Carings.."
+    },
+    "document" : [
+    {
+    "name" : "Certificate_1",
+    "description" : "certificate 1 as PDF"
+    },
+    {
+    "name" : "Certificate_2"
+    }
+    ],
+    "subprocess" : [
+    {
+    "name" : "Submit child’s file to the SAA"
+    },
+    {
+    "name" : "Work with SAA and CCI to complete medical tests, MER,CSR"
+    },
+    {
+    "name" : "Follow-up with SAA to upload child into Carings"
+    }
+    ],
+    "category" : "ABANDONED",
+    "order_no" : 4
+    }
+
+
+    {
+        "process" : 
+            {
+                "name" : "Submit to DCPU and get NOC",
+                "description" : "Submit to DCPU and get NOC...."
+            },
+        "document" : [
+            {
+                "name" : "Certificate_1",
+                "description" : "certificate 1 as PDF"
+            }
+        ],
+        "subprocess" : [
+            {
+                "name" : "Submit child’s report for DCPU for NOC"
+            },
+            {
+                "name" : "Receive DCPU NOC"
+            },
+            {
+                "name" : "Final Report from CCI"
+            }
+        ],
+        "category" : "ORPHANED",
+        "order_no" : 2
+    }
+
+
+    {
+        "process" : {
+        "name" : "Verify/obtain the surrender deed",
+        "description" : "Verify/obtain the surrender deed.."
+        },
+        "document" : [
+        {
+        "name" : "Certificate_1",
+        "description" : "certificate 1 as PDF"
+        }
+        ],
+        "subprocess" : [
+        {
+        "name" : "Is surrender deed is already done, make sure the original deed is in the child’s file"
+        },
+        {
+        "name" : "If surrender deed needs to be done, CCI should bring the parents in front of CWC and get the surrender deed signed"
+        },
+        {
+        "name" : "If the CWC declare surrender deed incomplete due to want of documents, follow abandonment process"
+        }
+        ],
+        "category" : "SURRENDERED",
+        "order_no" : 1
+        }
+
+    
+
+        {
+            "process" : {
+            "name" : "Get child uploaded to Carings",
+            "description" : "Get child uploaded to Carings.."
+            },
+            "document" : [
+            {
+            "name" : "Certificate_1",
+            "description" : "certificate 1 as PDF"
+            },
+            {
+            "name" : "Certificate_2"
+            }
+            ],
+            "subprocess" : [
+            {
+            "name" : "Submit child’s file to the SAA (if not already done in step 3)"
+            },
+            {
+            "name" : "Work with SAA and CCI to complete medical tests, MER,CSR"
+            },
+            {
+            "name" : "Follow-up with SAA to upload child into Carings"
+            }
+            ],
+            "category" : "SURRENDERED",
+            "order_no" : 3
+            }
+
+    
+    {
+        "process" : {
+        "name" : "Work on and complete documentation",
+        "description" : "Work on and complete documentation.."
+        },
+        "document" : [
+        {
+        "name" : "Certificate_1",
+        "description" : "certificate 1 as PDF"
+        },
+        {
+        "name" : "Certificate_2"
+        }
+        ],
+        "subprocess" : [
+        {
+        "name" : "Social Investigation Report"
+        },
+        {
+        "name" : "Newspaper Publication"
+        },
+        {
+        "name" : "TV Telecasting"
+        },
+        {
+        "name" : "File Report to trace guardians with police station"
+        },
+        {
+        "name" : "Final Police Report"
+        },
+        {
+        "name" : "Medical Report for age verification (if needed)"
+        }
+        ],
+        "category" : "CHILD ADMITTED IN CCI BY FAMILY",
+        "order_no" : 1
+        }
+
+    {
+        "process" : {
+        "name" : "Submit to DCPU and get NOC",
+        "description" : "Submit to DCPU and get NOC..."
+        },
+        "document" : [
+        {
+        "name" : "Certificate_1",
+        "description" : "certificate 1 as PDF"
+        },
+        {
+        "name" : "Certificate_2"
+        }
+        ],
+        "subprocess" : [
+        {
+        "name" : "Submit child’s report for DCPU for NOC"
+        },
+        {
+        "name" : "Receive DCPU NOC"
+        },
+        {
+        "name" : "Receive CCI Final Report"
+        }
+        ],
+        "category" : "CHILD ADMITTED IN CCI BY FAMILY",
+        "order_no" : 2
+        }
+
+        {
+            "process" : {
+            "name" : "Submit to DCPU and get NOC",
+            "description" : "Get child uploaded to Carings.."
+            },
+            "document" : [
+            {
+            "name" : "Certificate_1",
+            "description" : "certificate 1 as PDF"
+            },
+            {
+            "name" : "Certificate_2"
+            }
+            ],
+            "subprocess" : [
+            {
+            "name" : "Submit child’s report for DCPU for NOC"
+            },
+            {
+            "name" : "Receive DCPU NOC"
+            },
+            {
+            "name" : "Receive CCI Final Report"
+            }
+            ],
+            "category" : "CHILD ADMITTED IN CCI BY FAMILY",
+            "order_no" : 2
+            }

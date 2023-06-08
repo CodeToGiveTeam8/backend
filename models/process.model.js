@@ -4,9 +4,6 @@ module.exports = (sequelize,DataTypes) =>{
             type : DataTypes.STRING,
             allowNull : false,
         },
-        timeline : {
-            type : DataTypes.INTEGER,
-        },
         description : {
             type : DataTypes.STRING,
         },

@@ -60,7 +60,7 @@ module.exports = (sequelize,DataTypes) =>{
             validate : {
                 notEmpty : true,
                 customValidator(val) {
-                    if (val === null || (val!="NOT STARTED" && val!="DONE" && val!="WORKING")) {
+                    if (val === null || (val!="NOT STARTED" && val!="DONE" && val!="WORKING" && val!="STOPPED")) {
                       throw new Error('Invalid Status value');
                     }
                   }

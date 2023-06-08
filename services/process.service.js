@@ -1,4 +1,4 @@
-const { SaveProcess } = require("../models/repo")
+const { SaveProcess,GetSubProcessCount,GetSubProcessProgCount,GetProcessDocumentsCount,GetDocumentsUploadedCount } = require("../models/repo")
 
 const validateProcess = (process)=>{
 
@@ -17,4 +17,19 @@ const saveProcessService = async(process)=>{
     return process
 }
 
-module.exports = { validateProcess,saveProcessService }
+const isProcessDone = async(data)=>{
+    console.log(data)
+    val1 = await GetSubProcessCount(data.ProcessId)
+    val2 = await GetSubProcessProgCount(data.ProcessId,data.ChildChildId)
+    if(val1!=val2){
+        return false
+    }
+    val1 = await GetProcessDocumentsCount(data.ProcessId)
+    val2 = await GetDocumentsUploadedCount(data.ProcessId,data.ChildChildId)
+    if(val2<val1){
+        return false
+    }
+    return true
+}
+
+module.exports = { validateProcess,saveProcessService,isProcessDone }

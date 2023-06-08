@@ -9,11 +9,25 @@ module.exports = (sequelize,DataTypes) =>{
         status : {
             type : DataTypes.STRING,
             allowNull : false,
+            validate : {
+                notEmpty : true,
+                customValidator(val) {
+                    if (val === null || (val!="NOT DONE" && val!="DONE")) {
+                      throw new Error('Invalid Status value');
+                    }
+                  }
+            },
         },
         comment : {
             type : DataTypes.STRING,
         },
-
-    })
+    },{
+        indexes: [
+          {
+            unique: true,
+            fields: ['ProcessId', 'ChildId'],
+          },
+        ],
+      })
     return ProcessProgress
 }

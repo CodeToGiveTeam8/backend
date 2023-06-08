@@ -6,25 +6,33 @@ const { auth } = require("../middlewares");
 const userRouter = express.Router();
 
 userRouter.get("/user",auth,(req,res)=>{
-    console.log("getting user details")
+    res.status(200).json({
+        "data" : req.userData
+    })
 });
 
 userRouter.post("/user/register",async(req,res)=>{
     var user = req.body
-    console.log(user)
 
-    if(validateUser(user)){
+    try{
+        if(validateUser(user)){
         user = await saveUserService(user)
-        if(user==null){
+        if(user.error){
             return res.status(400).json({
-                "msg" : "Email Already exist"
+                "msg" : user.msg
             })
         }
         accessToken = genWebToken(user)
         return res.status(200).json({
             "msg":"User added Successfully"
         })
-    }else{
+        }else{
+            return res.status(400).json({
+                "msg" : "Invalid Body Request"
+            })
+        }
+    }catch(err){
+        console.log(err)
         return res.status(400).json({
             "msg" : "Invalid Body Request"
         })

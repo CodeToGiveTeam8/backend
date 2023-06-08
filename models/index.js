@@ -12,8 +12,10 @@ const db = {};
 
 let sequelize;
 if (config.use_env_variable) {
+  config.logging =  console.log
   sequelize = new Sequelize(process.env[config.use_env_variable], config);
 } else {
+  config.logging =  console.log
   sequelize = new Sequelize(config.database, config.username, config.password, config);
 }
 
@@ -67,20 +69,24 @@ User.hasOne(Team,{
 Orphanage.hasOne(Child)
 
 Process.hasMany(ProcessProgress)
-Child.hasMany(ProcessProgress)
+Child.hasMany(ProcessProgress,{
+  foreignKey: 'ChildId',
+})
 
 Process.hasMany(CategoryProcess)
 
 Process.hasMany(ProcessDocument)
 
-Child.hasMany(DocumentsUploaded)
-ProcessDocument.hasMany(DocumentsUploaded)
+Child.hasMany(DocumentsUploaded,{
+  foreignKey: 'ChildId',
+})
 Process.hasMany(DocumentsUploaded)
 
 Process.hasMany(SubProcess)
 
-ProcessProgress.hasMany(SubProcessProgress)
-Child.hasMany(SubProcessProgress)
+Child.hasMany(SubProcessProgress,{
+  foreignKey: 'ChildId',
+})
 Process.hasMany(SubProcessProgress)
 SubProcess.hasMany(SubProcessProgress)
 

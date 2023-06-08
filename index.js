@@ -2,6 +2,7 @@ const express = require("express");
 const cookieParser = require("cookie-parser");
 const bodyParser = require("body-parser")
 var cors = require('cors')
+const {createBucketIfNotExist} = require("./minio_services/minio.service")
 
 require('dotenv').config();
 
@@ -9,7 +10,7 @@ require('dotenv').config();
 const {auth} = require('./middlewares');
 
 //Routes
-const {userRouter,homeRouter,childRouter,processRouter, orphanageRouter} = require("./routes");
+const {userRouter,homeRouter,childRouter,processRouter, orphanageRouter,subtaskRouter,documentsUploadedRouter} = require("./routes");
 
 //DB Models
 const db = require('./models')
@@ -27,9 +28,12 @@ app.use(userRouter);
 app.use(homeRouter);
 app.use(childRouter);
 app.use(processRouter);
-app.use(orphanageRouter)
+app.use(orphanageRouter);
+app.use(subtaskRouter);
+app.use(documentsUploadedRouter);
 
 db.sequelize.sync().then((req)=>{
+    createBucketIfNotExist()
     app.listen(port,()=>{
         console.log(`listening in port ${port}`);
     });

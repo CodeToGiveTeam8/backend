@@ -1,4 +1,4 @@
-const { SaveChild,GetOrphanageId } = require("../models/repo")
+const { SaveChild,GetOrphanageId,ChangeStatus,ProcessProgressCheck,GetPrevStatus,GetNoOfProcessFromProcProg,GetChildById,GetNoOfProcessFromCat,AddProcessProg } = require("../models/repo")
 
 const validateChild = (child)=>{
 
@@ -23,4 +23,37 @@ const saveChildService = async(child)=>{
     return child
 }
 
-module.exports = { validateChild,saveChildService }
+const changeStatus = async(childId,Status)=>{
+    canChange = false
+    if(Status=="NOT STARTED"){
+        data = await ProcessProgressCheck(childId)
+        console.log(data)
+        if(data==null){
+            canChange = true
+        }
+    }else if(Status=="WORKING"){
+        data = await GetPrevStatus(childId)
+        if(data!="DONE"){
+            canChange = true
+            //check for last entry if there no prob --> else add a new entry
+            data = await AddProcessProg(childId)
+        }
+    }else if(Status=="DONE"){
+        val1 = await GetNoOfProcessFromProcProg(childId)
+        child = await GetChildById(childId)
+        val2 = await GetNoOfProcessFromCat(child.category)
+        console.log(val1,val2)
+        if(val1==val2){
+            canChange = true
+        }
+    }else{
+        canChange = true
+    }
+    if(canChange){
+        ChangeStatus(childId,Status)
+    }
+    
+    return canChange
+}
+
+module.exports = { validateChild,saveChildService,changeStatus }

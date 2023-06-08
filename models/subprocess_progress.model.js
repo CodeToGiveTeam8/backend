@@ -1,10 +1,11 @@
 module.exports = (sequelize,DataTypes) =>{
-    const SubProcessProgress = sequelize.define("SubProcessProgress",{
-        isDone : {
-            type : DataTypes.BOOLEAN,
-            defaultValue: 0
-        },
-
+    const SubProcessProgress = sequelize.define("SubProcessProgress",{},{
+        indexes: [
+            {
+              unique: true,
+              fields: ['ProcessId', 'ChildId','SubProcessId'],
+            },
+          ],
     })
     return SubProcessProgress
 }

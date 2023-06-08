@@ -1,5 +1,5 @@
 const express = require("express");
-const {validateChild,saveChildService} =  require("../services/child.service");
+const {validateChild,saveChildService,changeStatus} =  require("../services/child.service");
 const {getOrphanageIdService} = require("../services/orphanage.service")
 const { auth } = require("../middlewares");
 
@@ -35,5 +35,30 @@ childRouter.post("/child/add",auth,async(req,res)=>{
 childRouter.put("/child/edit",auth,async(req,res)=>{
     console.log("Edit Child data's")
 });
+
+childRouter.post("/child/status/edit",auth,async(req,res)=>{
+    Status = req.body.status
+    childId = req.body.childId
+    if(!Status || !childId){
+        return res.status(400).json({
+            "msg" : "Invalid Body Request"
+        })
+    }
+    if(Status!="NOT STARTED" && Status!="DONE" && Status!="WORKING" && Status!="STOPPED"){
+        return res.status(400).json({
+            "msg" : "Invalid Body Request"
+        })
+    }
+
+    if(childId.length==0){
+        return res.status(400).json({
+            "msg" : "Invalid Body Request"
+        })
+    }
+    changed = changeStatus(childId,Status)
+    return res.status(200).json({
+        "msg" : "Updated the status successfully"
+    })
+})
 
 module.exports = {childRouter};
