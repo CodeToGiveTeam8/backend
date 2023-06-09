@@ -29,18 +29,15 @@ const isProcessDone = async(data)=>{
 }
 
 const getFinishedProg = async(childId)=>{
-    data = await GetFinishedProg(childId)
-    return data
+    return await GetFinishedProg(childId)
 }
 
 const getCurrentlyWorkingProg = async(childId)=>{
-    data = await GetCurrentlyWorkingProg(childId)
-    return data
+    return await GetCurrentlyWorkingProg(childId)
 }
 
 const getDataNotStartedProg = async(chilId)=>{
-    data = await GetDataNotStartedProg(chilId)
-    return data
+    return await GetDataNotStartedProg(chilId)
 }
 
 module.exports = { validateProcess,saveProcessService,isProcessDone,getFinishedProg,getCurrentlyWorkingProg,getDataNotStartedProg }
