@@ -7,11 +7,11 @@ module.exports = (sequelize,DataTypes) =>{
         },
         state : {
             type : DataTypes.STRING,
-            allowNull : false,
+            defaultValue: "NA",
         },
         district : {
             type : DataTypes.STRING,
-            allowNull : false,
+            defaultValue: "NA",
         },
 
     })

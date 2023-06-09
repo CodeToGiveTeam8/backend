@@ -1,10 +1,10 @@
 const { SaveOrphanage, GetOrphanage, GetOrphanageId } = require("../models/repo")
 
 const validateOrphanage = async(data)=>{
-    if(!data.name || !data.state || !data.district){
+    if(!data.name){
         return false
     }
-    if(data.name.length==0 || data.state.length==0 || data.district.length==0){
+    if(data.name.length==0){
         return false
     }
     return true

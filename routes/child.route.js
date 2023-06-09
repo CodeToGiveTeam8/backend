@@ -1,12 +1,18 @@
 const express = require("express");
-const {validateChild,saveChildService,changeStatus} =  require("../services/child.service");
+const {validateChild,saveChildService,changeStatus,getChild} =  require("../services/child.service");
 const {getOrphanageIdService} = require("../services/orphanage.service")
+const { getUploadProfilePic,getProfilePic } = require("../minio_services/minio.service")
 const { auth } = require("../middlewares");
 
 const childRouter = express.Router();
 
-childRouter.get("/child",auth,(req,res)=>{
-    console.log("getting user details")
+childRouter.get("/child",auth,async(req,res)=>{
+    console.log(req.query)
+    childId = req.query.childId
+    childData = await getChild(childId)
+    return res.status(200).json({
+        "data" : childData
+    })
 });
 
 childRouter.post("/child/add",auth,async(req,res)=>{
@@ -23,7 +29,7 @@ childRouter.post("/child/add",auth,async(req,res)=>{
             })
         }
         return res.status(200).json({
-            "msg":"Child added Successfully"
+            "data": child
         })
     }else{
         return res.status(400).json({
@@ -59,6 +65,42 @@ childRouter.post("/child/status/edit",auth,async(req,res)=>{
     return res.status(200).json({
         "msg" : "Updated the status successfully"
     })
+})
+
+childRouter.post("/child/image",auth,async(req,res)=>{
+    var childId = req.body.childId
+    try{
+        if(childId){
+            childId = childId.replace(/\//g, '_');
+            link = await getUploadProfilePic(childId)
+            return res.status(400).json({
+                "link" : link
+            })
+        }
+    }catch(err){
+        console.log(err)
+        return res.status(400).json({
+            "msg" : "Invalid Body Request"
+        })
+    }
+})
+
+childRouter.get("/child/image",auth,async(req,res)=>{
+    var childId = req.query.childId
+    try{
+        if(childId){
+            childId = childId.replace(/\//g, '_');
+            link = await getProfilePic(childId)
+            return res.status(400).json({
+                "link" : link
+            })
+        }
+    }catch(err){
+        console.log(err)
+        return res.status(400).json({
+            "msg" : "Invalid Body Request"
+        })
+    }
 })
 
 module.exports = {childRouter};

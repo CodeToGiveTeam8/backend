@@ -13,7 +13,7 @@ documentsUploadedRouter.post("/document/upload/link",auth,async(req,res)=>{
 
     for(let element of documents)
     {
-        link = await getUploadLink(req.body.childId,req.body.processId,element.name)
+        link = await getUploadLink(req.body.childId,req.body.subProcessId,element.name)
         links.push(link)
     }
 
@@ -24,26 +24,12 @@ documentsUploadedRouter.post("/document/upload/link",auth,async(req,res)=>{
 
 documentsUploadedRouter.post("/document/add",auth,async(req,res)=>{
     documents = req.body.documents
-    data = {}
-
+    
     for(let element of documents)
     {
         element.ChildChildId = req.body.childId
-        element.ProcessId = req.body.processId
-        data.ChildChildId = req.body.childId
-        data.ProcessId = req.body.processId
+        element.SubProcessId = req.body.subProcessId
         await AddDocumentUploaded(element)
-    }
-
-    //check condn
-    console.log("DATA --> ",data)
-    if(await isProcessDone(data)){
-        console.log(data)
-        data = await ChangeProgStatus(req.body.childId,req.body.processId)
-        data = await AddProcessProg(req.body.childId)
-        if(data==null){
-            ChangeStatus(req.body.childId,"DONE")
-        }
     }
 
     return res.json({
@@ -53,10 +39,10 @@ documentsUploadedRouter.post("/document/add",auth,async(req,res)=>{
 
 documentsUploadedRouter.get("/document",auth,async(req,res)=>{
     const childId = req.query.childId;
-    const processId = req.query.processId;
+    const subProcessId = req.query.subProcessId;
 
     //get all documents name and id
-    data = await GetDocumentsUploaded(childId,processId)
+    data = await GetDocumentsUploaded(childId,subProcessId)
 
     return res.json({
         "data" : data
@@ -71,7 +57,7 @@ documentsUploadedRouter.get("/document/link",auth,async(req,res)=>{
     // console.log(data)
 
     if(data!=null){
-        link = await getDocumentUrl(data.dataValues.ChildId,data.dataValues.ProcessId,data.dataValues.document_name)
+        link = await getDocumentUrl(data.dataValues.ChildId,data.dataValues.SubProcessId,data.dataValues.document_name)
     }
 
     return res.json({
@@ -84,7 +70,7 @@ documentsUploadedRouter.delete("/document",auth,async(req,res)=>{
 
     data = GetDocumentUploadedById(documentId)
     await DeleteDocumentUploaded(documentId)
-    link = await deleteDocument(data.dataValues.ChildId,data.dataValues.ProcessId,data.dataValues.document_name)
+    link = await deleteDocument(data.dataValues.ChildId,data.dataValues.SubProcessId,data.dataValues.document_name)
 
     return res.json({
         "msg" : "Successfully deleted the document"

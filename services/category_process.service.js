@@ -1,4 +1,4 @@
-const {SaveCategoryProcess,GetCategoryProcess,GetProcessByID,GetSubProcessByID} = require("../models/repo")
+const {SaveCategoryProcess,GetCategoryProcess,GetProcessByID,GetSubProcessByID,GetDocumentsBySubprocessId} = require("../models/repo")
 
 const saveCategoryProcessService = async(data)=>{
     data = await SaveCategoryProcess(data)
@@ -12,10 +12,12 @@ const getCategoryProcess = async(category)=>{
         processData = await GetProcessByID(element.dataValues.ProcessId)
         console.log(processData)
         SubProcessData = await GetSubProcessByID(element.dataValues.ProcessId)
-        element.dataValues.process = processData
-        element.dataValues.subProcess = SubProcessData
+        for(let subprocess of SubProcessData){
+            subprocess.dataValues.documents = await GetDocumentsBySubprocessId(subprocess.dataValues.id)
+        }
+        element.dataValues.process = processData[0]
+        element.dataValues.process.dataValues.subProcess = SubProcessData
         r_data.push(element)
-        console.log(r_data)
     }
     return r_data
 }

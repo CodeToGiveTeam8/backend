@@ -75,12 +75,12 @@ Child.hasMany(ProcessProgress,{
 
 Process.hasMany(CategoryProcess)
 
-Process.hasMany(ProcessDocument)
+SubProcess.hasMany(ProcessDocument)
 
 Child.hasMany(DocumentsUploaded,{
   foreignKey: 'ChildId',
 })
-Process.hasMany(DocumentsUploaded)
+SubProcess.hasMany(DocumentsUploaded)
 
 Process.hasMany(SubProcess)
 

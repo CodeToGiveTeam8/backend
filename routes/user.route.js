@@ -1,6 +1,7 @@
 const express = require("express");
 const {validateUser,saveUserService,checkValidUser,getUserByEmail} =  require("../services/user.service")
 const {genWebToken} = require("../services/auth.service");
+const { getUploadProfilePic,getProfilePic } = require("../minio_services/minio.service")
 const { auth } = require("../middlewares");
 
 const userRouter = express.Router();
@@ -16,16 +17,17 @@ userRouter.post("/user/register",async(req,res)=>{
 
     try{
         if(validateUser(user)){
-        user = await saveUserService(user)
-        if(user.error){
-            return res.status(400).json({
-                "msg" : user.msg
+            user = await saveUserService(user)
+            console.log("--------->",user)
+            if(user.error){
+                return res.status(400).json({
+                    "msg" : user.msg
+                })
+            }
+            accessToken = genWebToken(user)
+            return res.status(200).json({
+                "msg":"User added Successfully"
             })
-        }
-        accessToken = genWebToken(user)
-        return res.status(200).json({
-            "msg":"User added Successfully"
-        })
         }else{
             return res.status(400).json({
                 "msg" : "Invalid Body Request"
@@ -38,6 +40,40 @@ userRouter.post("/user/register",async(req,res)=>{
         })
     }
 });
+
+userRouter.post("/user/image",async(req,res)=>{
+    var email = req.body.email
+    try{
+        if(email){
+            link = await getUploadProfilePic(email)
+            return res.status(400).json({
+                "link" : link
+            })
+        }
+    }catch(err){
+        console.log(err)
+        return res.status(400).json({
+            "msg" : "Invalid Body Request"
+        })
+    }
+})
+
+userRouter.get("/user/image",auth,async(req,res)=>{
+    var email = req.userData.email
+    try{
+        if(email){
+            link = await getProfilePic(email)
+            return res.status(400).json({
+                "link" : link
+            })
+        }
+    }catch(err){
+        console.log(err)
+        return res.status(400).json({
+            "msg" : "Invalid Body Request"
+        })
+    }
+})
 
 userRouter.post("/user/login",async(req,res)=>{
     var user = req.body

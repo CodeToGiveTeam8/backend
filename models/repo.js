@@ -122,6 +122,11 @@ const GetTeamLeadHome = async()=>{
 
 const SaveChild = async(child) => {
     //db.sequelize.query(`INSERT INTO Users (name, password, email, gender, role, dob, profile_image_url) values ('${user.name}','${user.password}','${user.email}','${user.gender}','${user.role}','${user.dob}','${user.profile_image_url}')`);
+    Object.keys(child).forEach((key) => {
+        if (child[key].length === 0) {
+          delete child[key];
+        }
+      });
     return await db.child.create({
       UserId : child.UserId,
       childId : child.childId,
@@ -173,7 +178,7 @@ const SaveProcessDocument = async(data) => {
     return await db.processDocument.create({
         name : data.name,
         description: data.description,
-        ProcessId : data.ProcessId
+        SubProcessId : data.SubProcessId
     }).then(function (data) {
         if (data) {
             return data
@@ -414,6 +419,23 @@ const SaveProcessProg = async(data)=>{
     });
 }
 
+const AddSubTask = async(data)=>{
+    return await db.subProcessProgress.create({
+        ChildId: data.ChildId,
+        ProcessId: data.ProcessId,
+        SubProcessId: data.SubProcessId
+    }).then(function (data) {
+        if (data) {
+            return data
+        } else {
+            return null
+        }
+    }).catch((err)=>{
+        console.log(err)
+        return null
+    });
+}
+
 const AddProcessProg = async(childId)=>{
     child = await GetChildById(childId)
     data = await GetCategoryProcess(child.category)
@@ -441,7 +463,16 @@ const AddProcessProg = async(childId)=>{
                 started_at : formattedDate,
             }
 
-            return await SaveProcessProg(n_process_prog)
+            new_proc_prog = await SaveProcessProg(n_process_prog)
+            for(const subProc of await GetSubProcessByID(process_id)){
+                await AddSubTask({
+                    ChildId : childId,
+                    ProcessId : process_id,
+                    SubProcessId : subProc.id
+                })
+            }
+
+            return new_proc_prog
         }    
 
     }
@@ -465,14 +496,14 @@ const AddDocumentUploaded = async(data)=>{
 
     doc_data = {
         ChildId: data.ChildChildId,
-        ProcessId: data.ProcessId,
+        SubProcessId: data.SubProcessId,
         document_name: data.name,
         updated_at : formattedDate
     }
 
     console.log(doc_data)
     
-    return await db.sequelize.query(`INSERT INTO DocumentsUploadeds (id,document_name,createdAt,updatedAt,ChildId,ProcessId) VALUES (DEFAULT,'${doc_data.document_name}','${UpdateDate}','${UpdateDate}','${doc_data.ChildId}',${doc_data.ProcessId})`, {
+    return await db.sequelize.query(`INSERT INTO DocumentsUploadeds (id,document_name,createdAt,updatedAt,ChildId,SubProcessId) VALUES (DEFAULT,'${doc_data.document_name}','${UpdateDate}','${UpdateDate}','${doc_data.ChildId}',${doc_data.SubProcessId})`, {
         logging: console.log,
       })
     
@@ -489,11 +520,11 @@ const AddDocumentUploaded = async(data)=>{
 
 }
 
-const GetDocumentsUploaded = async(childId,processId)=>{
+const GetDocumentsUploaded = async(childId,subProcessId)=>{
     data = await db.documentsUploaded.findAll({
         where: {
             ChildId : childId,
-            ProcessId : processId
+            SubProcessId : subProcessId
         },
       })
     return data
@@ -525,10 +556,12 @@ const DoneSubTask = async(data)=>{
         ProcessId: data.ProcessId,
         SubProcessId: data.SubProcessId
     })
-    return await db.subProcessProgress.create({
-        ChildId: data.ChildId,
-        ProcessId: data.ProcessId,
-        SubProcessId: data.SubProcessId
+    return await db.subProcessProgress.update({status : "DONE"},{
+        where : {
+            ChildId: data.ChildId,
+            ProcessId: data.ProcessId,
+            SubProcessId: data.SubProcessId
+        }
     }).then(function (data) {
         if (data) {
             return data
@@ -541,11 +574,12 @@ const DoneSubTask = async(data)=>{
     });
 }
 
-const DeleteSubTask = async(data)=>{
-    return await db.subProcessProgress.destroy({
-        ChildId: data.ChildChildId,
-        ProcessId: data.ProcessId,
-        SubProcessId: data.SubProcessId
+const NotDoneSubTask = async(data)=>{
+    return await db.subProcessProgress.update({ status : "NOT DONE" },{
+        where : {
+            ChildId: data.childId,
+            SubProcessId: data.subProcessId
+        }
     }).then(function (data) {
         if (data) {
             return data
@@ -572,27 +606,28 @@ const GetSubProcessProgCount = async(ProcessId,ChildChildId)=>{
     data = await db.subProcessProgress.findAll({
         where: {
             ProcessId : ProcessId,
-            ChildId : ChildChildId
+            ChildId : ChildChildId,
+            status : "DONE"
         },
       })
 
     return data.length
 }
 
-const GetProcessDocumentsCount = async(ProcessId)=>{
+const GetProcessDocumentsCount = async(SubProcessId)=>{
     data = await db.processDocument.findAll({
         where: {
-            ProcessId : ProcessId,
+            SubProcessId : SubProcessId,
         },
       })
 
     return data.length
 }
 
-const GetDocumentsUploadedCount = async(ProcessId,ChildChildId)=>{
+const GetDocumentsUploadedCount = async(SubProcessId,ChildChildId)=>{
     data = await db.documentsUploaded.findAll({
         where: {
-            ProcessId : ProcessId,
+            SubProcessId : SubProcessId,
             ChildId : ChildChildId
         },
       })
@@ -600,7 +635,7 @@ const GetDocumentsUploadedCount = async(ProcessId,ChildChildId)=>{
     return data.length
 }
 
-const ChangeProgStatus = async(child_id,process_id)=>{
+const ChangeProgStatus = async(child_id,process_id,statusVal)=>{
     console.log({
         ChildId : child_id,
         ProcessId : process_id
@@ -614,7 +649,7 @@ const ChangeProgStatus = async(child_id,process_id)=>{
         .then((results) => {
           // Update the column values by adding the previous value
           results.forEach((row) => {
-            row.status = "DONE";
+            row.status = statusVal;
             row.save();
           });
           console.log('Status Updated successfully for process_prog.');
@@ -623,7 +658,114 @@ const ChangeProgStatus = async(child_id,process_id)=>{
           console.error('Error:', error);
         });
 
+}
+
+const GetDocumentsBySubprocessId = async(id)=>{
+    data = await db.processDocument.findAll({
+        where: {
+            SubProcessId : id,
+        },
+      })
+
     return data
+}
+
+const GetFinishedProg = async(childId)=>{
+    data = await db.processProgress.findAll({
+        where: {
+            ChildId : childId,
+            Status : "DONE"
+        },
+      })
+
+    if(data!=null && data.length>0){
+        sub_data = await db.subProcessProgress.findAll({
+            where: {
+                ProcessId : data.dataValues.ProcessId,
+                Status : "DONE"
+            },
+          })
+        if(sub_data){
+            data.dataValues.subProcess = sub_data
+        }
+    }
+
+    return data
+}
+
+const GetCurrentlyWorkingProg = async(childId)=>{
+    data = await db.processProgress.findAll({
+        where: {
+            ChildId : childId,
+            Status : "NOT DONE"
+        },
+      })
+
+    if(data!=null && data.length>0){
+        console.log("data : ",data)
+        sub_data = await db.subProcessProgress.findAll({
+            where: {
+                ProcessId : data[0].dataValues.ProcessId
+            },
+          })
+        if(sub_data){
+            data[0].dataValues.subProcess = sub_data
+        }
+    }
+
+    console.log(data)
+    return data
+}
+
+const checkIfProcessIdInProg = async(childId,processId)=>{
+    data = await db.processProgress.findOne({
+        where: {
+            ChildId : childId,
+            ProcessId : processId
+        },
+      })
+
+    if(data!=null){
+        return true
+    }
+
+    return false
+}
+
+const GetProcessDetails = async(processId)=>{
+    data = await db.process.findOne({
+        where: {
+            ProcessId : processId
+        },
+      })
+
+    if(data!=null && data.length>0){
+        sub_data = await db.subProcess.findAll({
+            where: {
+                ProcessId : processId
+            },
+          })
+        if(sub_data){
+            data.dataValues.subProcess = sub_data
+        }
+    }
+
+    return data
+}
+
+const GetDataNotStartedProg = async(childId)=>{
+    child_data = await GetChildById(childId)
+    if(child_data){
+        cat_prog = await GetCategoryProcess(child_data.category)
+        data = []
+        for(ele of cat_prog){
+            if(!checkIfProcessIdInProg(childId,ele.dataValues.ProcessId)){
+                data.push(await GetProcessDetails(ele.dataValues.ProcessId))
+            }
+        }
+        return data
+    }
+    return null
 }
 
 module.exports = {SaveUser,GetUserByEmail,GetGrassRootHome,AddToTeam,
@@ -632,5 +774,6 @@ module.exports = {SaveUser,GetUserByEmail,GetGrassRootHome,AddToTeam,
     GetProcessByID,GetSubProcessByID,ChangeStatus,ProcessProgressCheck,GetPrevStatus,
     GetNoOfProcessFromProcProg,GetChildById,GetNoOfProcessFromCat,AddProcessProg,SaveProcessProg,
     AddDocumentUploaded,GetDocumentsUploaded,GetDocumentUploadedById,DeleteDocumentUploaded,
-    DoneSubTask,DeleteSubTask,GetSubProcessCount,GetSubProcessProgCount,GetProcessDocumentsCount,
-    GetDocumentsUploadedCount,ChangeProgStatus,GetTeamLeadByEmail}
+    DoneSubTask,NotDoneSubTask,GetSubProcessCount,GetSubProcessProgCount,GetProcessDocumentsCount,
+    GetDocumentsUploadedCount,ChangeProgStatus,GetTeamLeadByEmail,GetDocumentsBySubprocessId,
+    GetFinishedProg,GetCurrentlyWorkingProg,GetDataNotStartedProg}

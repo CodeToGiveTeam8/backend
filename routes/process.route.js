@@ -1,15 +1,15 @@
 const express = require("express");
-const {validateProcess,saveProcessService} =  require("../services/process.service");
+const {validateProcess,saveProcessService,getFinishedProg,getCurrentlyWorkingProg,getDataNotStartedProg} =  require("../services/process.service");
 const {validateProcessDocuments,saveProcessDocumentService} =  require("../services/document.service");
 const {saveCategoryProcessService,getCategoryProcess} = require("../services/category_process.service")
 const {addSubProcessService,validateSubProcess} = require("../services/subprocess.service")
 
 const {auth} = require("../middlewares/index");
+const { GetChildById } = require("../models/repo");
 
 const processRouter = express.Router();
 
 processRouter.get("/process",auth,async(req,res)=>{
-    console.log(req.query)
     const category = req.query.category;
     console.log(category)
     if(!category){
@@ -32,29 +32,36 @@ processRouter.post("/process/add",auth,async(req,res)=>{
     console.log(req.userData)
     if(req.userData.role != "OPERATION"){
         return res.status(400).json({
-            "msg":"Only OPERATION can add new Process!"
+            "msg":"Only OPERATION user can add new Process!"
         })
     }
 
-    var process = req.body.process
-    var documents = req.body.document
-    var subprocess = req.body.subprocess
+    var process = {}
+    process.name = req.body.name
+    process.description = req.body.description
+    // var documents = req.body.document
+    var subprocess = req.body.subprocess //array
 
-    if(validateProcess(process) && validateProcessDocuments(documents) && validateSubProcess(subprocess)
+    if(validateProcess(process) && validateSubProcess(subprocess)
         && (req.body.category && (req.body.category=="ABANDONED" || req.body.category=="SURRENDERED" || req.body.category=="ORPHANED" || req.body.category=="CHILD ADMITTED IN CCI BY FAMILY")) 
         && (req.body.order_no && Number.isInteger(req.body.order_no))){
 
         r_Process = await saveProcessService(process)
-        for(let document of documents)
-        { 
-            document.ProcessId = r_Process.dataValues.id
-            r_document = await saveProcessDocumentService(document)
-        }
 
         for(let sp of subprocess)
         {
             sp.ProcessId = r_Process.dataValues.id
             r_subprocess = await addSubProcessService(sp)
+            documents = sp.documents //array
+            for(let document of documents)
+            { 
+                data = {
+                    ProcessId : r_Process.dataValues.id,
+                    SubProcessId : r_subprocess.dataValues.id,
+                    name : document
+                }
+                r_document = await saveProcessDocumentService(data)
+            }
         }
 
         data = {
@@ -62,7 +69,6 @@ processRouter.post("/process/add",auth,async(req,res)=>{
             category : req.body.category,
             order_no : req.body.order_no,
         }
-
 
         r_categoryProcess = await saveCategoryProcessService(data)
         return res.status(200).json({
@@ -74,7 +80,27 @@ processRouter.post("/process/add",auth,async(req,res)=>{
         })
     }
 
+})
 
+processRouter.get("/process/progress",auth,async(req,res)=>{
+    ChildId = req.query.childId
+    childData = await GetChildById(ChildId)
+    if(childData && childData.status=="NOT STARTED"){
+        data = { finished : null, working : null }
+        data.notStarted = getCategoryProcess(childData.category)
+        return res.status(200).json({
+            "data": data
+        })
+    }
+
+    data = {}
+    data.finished = await getFinishedProg(ChildId)
+    data.working = await getCurrentlyWorkingProg(ChildId)
+    data.notStarted = await getDataNotStartedProg(ChildId)
+
+    return res.status(200).json({
+        "data": data
+    })
 
 })
 

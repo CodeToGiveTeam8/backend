@@ -18,6 +18,11 @@ const validateChild = (child)=>{
     return true
 }
 
+const getChild = async(id)=>{
+    child = await GetChildById(id)
+    return child
+}
+
 const saveChildService = async(child)=>{
     child = await SaveChild(child)
     return child
@@ -56,4 +61,4 @@ const changeStatus = async(childId,Status)=>{
     return canChange
 }
 
-module.exports = { validateChild,saveChildService,changeStatus }
+module.exports = { validateChild,saveChildService,changeStatus,getChild }

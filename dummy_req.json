@@ -1,43 +1,5 @@
 {
     "process" : {
-        "name" : "Work on and complete documentation",
-        "description" : "Work on and complete documentation...."
-    },
-    "document" : [
-        {
-            "name" : "Certificate_1",
-            "description" : "certificate 1 as PDF"
-        },
-        {
-            "name" : "Certificate_2"
-        }
-    ],
-    "subprocess" : [
-        {
-            "name" : "Newspaper Publication"
-        },
-        {
-            "name" : "TV Telecasting"
-        },
-        {
-            "name" : "File Missing Compliant, if not already done"
-        },
-        {
-            "name" : "Final Police Report"
-        },
-        {
-            "name" : "Medical Report for age verification (if needed)"
-        },
-        {
-            "name" : "Social Investigation Report (if needed)"
-        }
-    ],
-    "category" : "ABANDONED",
-    "order_no" : 1
-}
-
-{
-    "process" : {
         "name" : "Submit to CWC and get LFA",
         "description" : "Submit to CWC and get LFA..."
     },
@@ -273,3 +235,101 @@
             "category" : "CHILD ADMITTED IN CCI BY FAMILY",
             "order_no" : 2
             }
+
+
+
+{
+    "name" : "Work on and complete documentation",
+    "description" : "Work on and complete documentation....",
+    "category" : "ABANDONED",
+    "order_no" : 1,
+    "subprocess" : [
+        {
+            "name" : "Newspaper Publication",
+            "documents" : ["doc-1","doc-2"]
+        },
+        {
+            "name" : "TV Telecasting",
+            "documents" : ["doc-1","doc-2"]
+        },
+        {
+            "name" : "File Missing Compliant, if not already done",
+            "documents" : []
+        },
+        {
+            "name" : "Final Police Report",
+            "documents" : []
+        },
+        {
+            "name" : "Medical Report for age verification (if needed)",
+            "documents" : []
+        },
+        {
+            "name" : "Social Investigation Report (if needed)",
+            "documents" : []
+        }
+    ]
+}
+
+{
+    "name" : "Submit to DCPU and get NOC",
+    "description" : "Submit to DCPU and get NOC....",
+    "category" : "ABANDONED",
+    "order_no" : 2,
+    "subprocess" : [
+        {
+            "name" : "Submit child’s report for DCPU for NOC",
+            "documents" : []
+        },
+        {
+            "name" : "Receive DCPU NOC",
+            "documents" : []
+        },
+        {
+            "name" : "Final Report from CCI",
+            "documents" : []
+        }
+    ]
+}
+
+{
+    "name" : "Submit to CWC and get LFA",
+    "description" : "Submit to CWC and get LFA....",
+    "category" : "ABANDONED",
+    "order_no" : 3,
+    "subprocess" : [
+        {
+            "name" : "Submit the case to CWC for getting the legally free for adoption (LFA) certificate",
+            "documents" : ["child report"]
+        },
+        {
+            "name" : "CWC will issue the LFA to the CCI/SAA",
+            "documents" : []
+        },
+        {
+            "name" : "Submit letter to DCPU to link the child to the relevant SAA",
+            "documents" : []
+        }
+    ]
+}
+
+{
+    "name" : "Get child uploaded to Carings",
+    "description" : "Get child uploaded to Carings....",
+    "category" : "ABANDONED",
+    "order_no" : 4,
+    "subprocess" : [
+        {
+            "name" : "Submit child’s file to the SAA",
+            "documents" : ["doc - 5"]
+        },
+        {
+            "name" : "Work with SAA and CCI to complete medical tests, MER, CSR",
+            "documents" : []
+        },
+        {
+            "name" : "Follow-up with SAA to upload child into Carings",
+            "documents" : []
+        }
+    ]
+}

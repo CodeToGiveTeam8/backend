@@ -1,6 +1,7 @@
 const {SaveUser,GetUserByEmail,GetGrassRootHome,GetTeamLeadHome,GetTeamLeadByEmail,AddToTeam} = require("../models/repo")
 
 const validateUser = (user)=>{
+    console.log(user)
     if( user.name.length==0 || user.password.length<=3 || user.gender.length==0 || user.email.length==0 || (user.role!="GRASSROOT" && user.role!="TEAM LEAD" && user.role!="OPERATION")){
         console.log("Here")
         return false
@@ -55,6 +56,7 @@ const getUserByEmail = async(email)=>{
 }
 
 const getUserHomeDetails = async(user)=>{
+    console.log(user)
     if(user.role == "GRASSROOT"){
         //get details only from his cases
         childDetails = await GetGrassRootHome(user.id)
