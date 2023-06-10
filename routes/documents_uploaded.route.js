@@ -1,6 +1,7 @@
 const express = require("express");
 const {auth} = require("../middlewares/index");
-const { AddDocumentUploaded,GetDocumentsUploaded,GetDocumentUploadedById,DeleteDocumentUploaded,AddProcessProg,ChangeStatus,ChangeProgStatus } = require("../models/repo");
+const { AddDocumentUploaded,GetDocumentsUploaded,GetDocumentUploadedById,DeleteDocumentUploaded,
+    AddProcessProg,ChangeStatus,ChangeProgStatus,GetLastUploadedDoc } = require("../models/repo");
 const { getDocumentUrl,deleteDocument,getUploadLink } = require("../minio_services/minio.service")
 const { isProcessDone } = require("../services/process.service")
 
@@ -24,16 +25,18 @@ documentsUploadedRouter.post("/document/upload/link",auth,async(req,res)=>{
 
 documentsUploadedRouter.post("/document/add",auth,async(req,res)=>{
     documents = req.body.documents
+    let docs = []
     
     for(let element of documents)
     {
         element.ChildChildId = req.body.childId
         element.SubProcessId = req.body.subProcessId
         await AddDocumentUploaded(element)
+        docs.push(await GetLastUploadedDoc(element))
     }
 
     return res.json({
-        "msg" : "Successfully added all the documents"
+        "data" : docs
     })
 })
 

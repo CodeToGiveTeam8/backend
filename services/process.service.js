@@ -1,4 +1,7 @@
-const { SaveProcess,GetSubProcessCount,GetSubProcessProgCount,GetProcessDocumentsCount,GetDocumentsUploadedCount,GetFinishedProg,GetCurrentlyWorkingProg,GetDataNotStartedProg } = require("../models/repo")
+const { SaveProcess,GetSubProcessCount,GetSubProcessProgCount,GetProcessDocumentsCount,
+    GetDocumentsUploadedCount,GetFinishedProg,GetCurrentlyWorkingProg,GetDataNotStartedProg,
+    GetSubProcessProgress,GetDocumentsNeeded, GetDocumentsUploaded, GetSubProcessByProcessID, GetSubProcessByID
+ } = require("../models/repo")
 
 const validateProcess = (process)=>{
 
@@ -40,4 +43,18 @@ const getDataNotStartedProg = async(chilId)=>{
     return await GetDataNotStartedProg(chilId)
 }
 
-module.exports = { validateProcess,saveProcessService,isProcessDone,getFinishedProg,getCurrentlyWorkingProg,getDataNotStartedProg }
+const getChildProcessDetails = async(childId,processId)=>{
+    //get data from subprocessProgress
+    let sub_proc_prog = await GetSubProcessProgress(childId,processId)
+    for(let i=0;i<sub_proc_prog.length;i++){
+        let sub_proc_details = await GetSubProcessByID(sub_proc_prog[i].dataValues.SubProcessId)
+        sub_proc_prog[i].dataValues.name = sub_proc_details.name
+        sub_proc_prog[i].dataValues.documentsNeeded = await GetDocumentsNeeded(sub_proc_prog[i].dataValues.SubProcessId)
+        sub_proc_prog[i].dataValues.documentsUploaded = await GetDocumentsUploaded(childId,sub_proc_prog[i].dataValues.SubProcessId)
+    }
+    return sub_proc_prog
+    //get required docs from process_docs
+    //get docs uploaded for each subprocess
+}
+
+module.exports = { validateProcess,saveProcessService,isProcessDone,getFinishedProg,getCurrentlyWorkingProg,getDataNotStartedProg,getChildProcessDetails}

@@ -333,3 +333,158 @@
         }
     ]
 }
+
+
+
+
+
+import React, { useState,useEffect } from 'react';
+import '../CSSstyles/StatusUpdate.css';
+import NavBar from '../Navs/grassrootnav';
+import { makeStyles } from '@material-ui/core/styles';
+import { useParams } from 'react-router-dom';
+import {useNavigate} from "react-router-dom";
+import {
+  Grid,
+  Paper,
+  FormControlLabel,
+  Checkbox,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  TextField,
+} from '@material-ui/core';
+import backgroundImage from './reg.jpg';
+import Cookies from 'universal-cookie';
+
+const useStyles = makeStyles((theme) => ({
+  root: {
+    flexGrow: 1,
+    marginTop: theme.spacing(50),
+    marginLeft: theme.spacing(30),
+    // Adjust margin to match NavBar height
+  },
+  content: {
+    position: 'relative',
+    minHeight: '100vh',
+    paddingTop: theme.spacing(2),
+    overflow: 'hidden',
+    marginBottom: theme.spacing(10),
+  },
+  background: {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    height: '100%',
+    width: '100%',
+    zIndex: -1,
+    filter: 'blur(3px)',
+    background: `url(${backgroundImage})`,
+    backgroundSize: 'cover',
+    backgroundAttachment: 'fixed',
+  },
+  paper: {
+    textAlign: 'left',
+    color: theme.palette.text.secondary,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingTop: theme.spacing(2),
+    height: '40%',
+    marginBottom: theme.spacing(2),
+    width: '100%',
+    overflow: 'auto', // Add overflow auto to enable scrolling when content overflows
+    display: 'flex', // Add display flex
+    flexDirection: 'column', // Add flex-direction column
+    justifyContent: 'center',
+    color: 'black',
+  },
+  firstRowPaper: {
+    backgroundColor: 'lavender',
+    fontWeight: 'bold',
+    paddingTop: theme.spacing(2),
+    paddingBottom: theme.spacing(2),
+    marginBottom: theme.spacing(2),
+  },
+  documentTypes: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    textAlign: 'center',
+  },
+  checkboxLabel: {
+    display: 'flex',
+    alignItems: 'center',
+  },
+  checkboxText: {
+    marginLeft: theme.spacing(1),
+  },
+}));
+
+function GDetails() {
+  const classes = useStyles();
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const cookies = new Cookies()
+  const ChildId = decodeURIComponent(id);
+
+
+
+const APICall = (configObject)=>{
+    return new Promise((resolve,reject)=>{
+      fetch(configObject.url,{
+        method:configObject.method?configObject.method:'GET',
+        body:configObject.body?JSON.stringify(configObject.body):null,
+        headers:configObject.headers?configObject.headers:{},
+      }).then((response)=>resolve(response.json()))
+    })
+  }
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const token = cookies.get("accessToken"); // to get token already present.If there is token ,login page should not be rendered
+        const configObject = {
+          url:`http://localhost:8081/process/progress?childId=${childId}`,
+          method:'GET',
+          headers:{'Content-Type':'application/json','Authorization': token},
+        }
+        const responseData = await APICall(configObject)
+        const data = responseData['data']
+        console.log(data)
+        setFinished(data.finished)
+        setWorking(data.working)
+        setNotStarted(data.notStarted)
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    };
+
+    fetchData();
+  }, [childId]); 
+
+
+
+  useEffect(()=>{
+      const fetchData = async () => {
+        try {
+          console.log(`http://localhost:8081/process/progress`)
+          const token = cookies.get("accessToken"); // to get token already present.If there is token ,login page should not be rendered
+          const configObject = {
+            url:`http://localhost:8081/process/progress`,
+            method:'GET',
+            headers:{'Content-Type':'application/json','Authorization': token},
+          }
+          const responseData = await APICall(configObject)
+          const data = responseData['data']
+          console.log(responseData)
+          console.log(data)
+          // setChild(data)
+        } catch (error) {
+          console.error('Error:', error);
+        }
+      };
+  
+      fetchData();
+    },[child])

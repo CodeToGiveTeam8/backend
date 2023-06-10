@@ -1,5 +1,5 @@
 const express = require("express");
-const {validateProcess,saveProcessService,getFinishedProg,getCurrentlyWorkingProg,getDataNotStartedProg} =  require("../services/process.service");
+const {validateProcess,saveProcessService,getFinishedProg,getCurrentlyWorkingProg,getDataNotStartedProg,getChildProcessDetails} =  require("../services/process.service");
 const {validateProcessDocuments,saveProcessDocumentService} =  require("../services/document.service");
 const {saveCategoryProcessService,getCategoryProcess} = require("../services/category_process.service")
 const {addSubProcessService,validateSubProcess} = require("../services/subprocess.service")
@@ -86,7 +86,7 @@ processRouter.get("/process/progress",auth,async(req,res)=>{
     ChildId = req.query.childId
     childData = await GetChildById(ChildId)
     if(childData && childData.status=="NOT STARTED"){
-        data = { finished : null, working : null }
+        let data = { finished : [], working : [] }
         data.notStarted = await getCategoryProcess(childData.category)
         return res.status(200).json({
             "data": data
@@ -98,12 +98,24 @@ processRouter.get("/process/progress",auth,async(req,res)=>{
     res_data.working = await getCurrentlyWorkingProg(ChildId)
     res_data.notStarted = await getDataNotStartedProg(ChildId)
 
-    // console.log(res_data)
+    console.log("\n\n\n\n : ",res_data)
 
     return res.status(200).json({
         "data": res_data
     })
 
 })
+
+processRouter.get("/child/process",auth,async(req,res)=>{
+    const ChildId = req.query.childId
+    const ProcessId = req.query.processId
+    var res_data = await getChildProcessDetails(ChildId,ProcessId)
+
+    return res.status(200).json({
+        "data": res_data
+    })
+
+})
+
 
 module.exports = {processRouter}

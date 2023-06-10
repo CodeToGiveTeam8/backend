@@ -45,9 +45,9 @@ subtaskRouter.post("/subtask/notdone",auth,async(req,res)=>{
     subtask = req.body
     await NotDoneSubTask(subtask)
     //change process to notDone
-    await ChangeProgStatus(subtask.childId,subtask.processId,"NOT DONE")
+    await ChangeProgStatus(subtask.ChildId,subtask.ProcessId,"NOT DONE")
     //change childStatus to working
-    ChangeStatus(subtask.childId,"WORKING")
+    ChangeStatus(subtask.ChildId,"WORKING")
     
     return res.json({
         "msg" : "Changed Successfully"

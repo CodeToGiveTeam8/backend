@@ -78,7 +78,6 @@ userRouter.get("/user/image",auth,async(req,res)=>{
 userRouter.post("/user/login",async(req,res)=>{
     var user = req.body
     //Just to inform frontend that the user is logged In.Front end should do necessary validation so that this route is not accessed,
-    console.log(req.userData)
     if(req.userData){
         console.log("This user is logged in...No need to do anything")
         return res.status(200).json({
@@ -95,6 +94,7 @@ userRouter.post("/user/login",async(req,res)=>{
     if(await checkValidUser(user)){
         user = await getUserByEmail(user.email)
         accessToken = genWebToken(user)
+        console.log(accessToken)
         return res.json({
             "access-token" : accessToken
         })
