@@ -109,18 +109,35 @@ const getUploadProfilePic = async(folderName)=>{
   }
 }
 
+const isExist = async (bucketName, objectName) => {
+  try {
+    // Use statObject to check if the object exists
+    await minioClient.statObject(bucketName, objectName);
+    return true
+  } catch (error) {
+    if (error.code === 'NotFound') {
+      return false
+    } else {
+      return false
+    }
+  }
+};
+
 const getProfilePic = async(folderName)=>{
   const bucketName = 'profile';
   const prefix = `${folderName}/profile_image`;
   try {
     const objectName = `${prefix}`; // Replace with the desired filename and extension
-    const url = await minioClient.presignedGetObject(bucketName, objectName,  60 * 60); // Expiry time in seconds
-
-    console.log('Pre-signed URL:', url);
-    return url;
+    if(await isExist(bucketName, objectName)){
+      const url = await minioClient.presignedGetObject(bucketName, objectName,  60 * 60); // Expiry time in seconds
+      console.log('Pre-signed URL:', url);
+      return url;
+    }else{
+      return ""
+    }
   } catch (err) {
     console.error('Error:', err);
-    return null;
+    return "";
   }
 }
 

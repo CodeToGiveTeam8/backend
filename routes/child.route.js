@@ -81,6 +81,7 @@ childRouter.post("/child/image",auth,async(req,res)=>{
         if(childId){
             childId = childId.replace(/\//g, '_');
             link = await getUploadProfilePic(childId)
+            console.log(link)
             return res.status(400).json({
                 "link" : link
             })
