@@ -7,7 +7,6 @@ const { auth } = require("../middlewares");
 const childRouter = express.Router();
 
 childRouter.get("/child",auth,async(req,res)=>{
-    console.log(req.query)
     childId = req.query.childId
     childData = await getChild(childId)
     return res.status(200).json({
