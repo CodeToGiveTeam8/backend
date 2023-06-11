@@ -87,7 +87,7 @@ processRouter.get("/process/progress",auth,async(req,res)=>{
     childData = await GetChildById(ChildId)
     if(childData && childData.status=="NOT STARTED"){
         let data = { finished : [], working : [] }
-        data.notStarted = await getCategoryProcess(childData.category)
+        data.notStarted = await getDataNotStartedProg(ChildId)
         return res.status(200).json({
             "data": data
         })

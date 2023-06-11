@@ -103,7 +103,7 @@ const GetGrassRootHome = async(id)=>{
     }
 }
 
-const GetTeamLeadHome = async()=>{
+const GetAllChildData = async()=>{
     childDetails = await db.child.findAll({})
     if (childDetails === null) {
         return null
@@ -703,7 +703,6 @@ const GetFinishedProg = async(childId)=>{
 
           for(let j=0;j<sub_var1_data.length;j++){
             let x = await GetSubProcessByID(sub_var1_data[j].dataValues.SubProcessId)
-            console.log("--------->",x)
             sub_var1_data[j].dataValues.name = x.dataValues.name
           }
             if(sub_var1_data){
@@ -770,8 +769,6 @@ const GetProcessDetails = async(processId)=>{
             id : processId
         },
       })
-    
-    console.log("742 : ",p_data)
 
     if(p_data!=null){
         let subp_data = await db.subProcess.findAll({
@@ -779,6 +776,11 @@ const GetProcessDetails = async(processId)=>{
                 ProcessId : processId
             },
           })
+        
+        for(subp_ele of subp_data){
+            subp_ele.dataValues.status = "NOT DONE" 
+        }
+
         if(subp_data){
             p_data.dataValues.subProcess = subp_data
         }
@@ -834,8 +836,72 @@ const GetLastUploadedDoc = async(data)=>{
     })
 }
 
+const GetTeamLeadData = async(id)=>{
+    //get all grassrootId's from teams
+    let res_data = []
+    let teams = await db.team.findAll({
+        where : {
+            managerId: id
+        }
+    })
+    for(let var1 of teams){
+        res_data.push(await GetUserByID(var1.grassrootId))
+        var childDetails = await db.child.findAll({ where: { userId: var1.grassrootId } })
+        var lastindex = res_data.length-1
+        if (childDetails === null) {
+            childDetails = []
+        } else {
+            for (let i = 0; i < childDetails.length; i++) {
+                userDetail = await GetUserByID(childDetails[i].UserId)
+                orphanageDetail = await GetOrphanageByName(childDetails[i].OrphanageId)
+                childDetails[i].dataValues.user_name = userDetail.name
+                childDetails[i].dataValues.user_email = userDetail.email
+                childDetails[i].dataValues.orphanage = orphanageDetail.name
+            }
+        }
+        res_data[lastindex].dataValues.childDetails = childDetails
+
+    }
+    return res_data
+}
+
+const GetProcessNotDone = async(id)=>{
+    let proc_arr = []
+    let proc_prog = await db.processProgress.findAll({ where : { ChildId : id, status : "NOT DONE" } })
+    for (let i = 0; i < proc_prog.length; i++) {
+        let proc_detail = await GetProcessDetails(proc_prog[i].dataValues.ProcessId)
+        if(proc_detail){
+            proc_arr.push(proc_detail.dataValues.name)
+        }
+    }
+    return proc_arr
+}
+
+const GetPendingWork = async(user_id)=>{
+    let childDetails = await db.child.findAll({ where: { userId: user_id } })
+    if (childDetails === null) {
+        return []
+    } else {
+        let ret_arr = []
+        for (let i = 0; i < childDetails.length; i++) {
+            let process_notDone = await GetProcessNotDone(childDetails[i].dataValues.childId)
+            if(process_notDone){
+                childDetails[i].dataValues.process = process_notDone[0]
+            }
+            if(childDetails[i].dataValues.process){
+                ret_arr.push({
+                    "ChildId" : childDetails[i].dataValues.childId,
+                    "processName" : childDetails[i].dataValues.process
+                })
+            }
+            
+        }
+        return ret_arr
+    }
+}
+
 module.exports = {SaveUser,GetUserByEmail,GetGrassRootHome,AddToTeam,
-    GetTeamLeadHome,SaveChild,SaveProcess,SaveProcessDocument,SaveCategoryProcess,
+    GetAllChildData,SaveChild,SaveProcess,SaveProcessDocument,SaveCategoryProcess,
     SaveOrphanage,GetOrphanage,GetOrphanageId,SaveSubProcessService,GetCategoryProcess,
     GetProcessByID,GetSubProcessByProcessID,ChangeStatus,ProcessProgressCheck,GetPrevStatus,
     GetNoOfProcessFromProcProg,GetChildById,GetNoOfProcessFromCat,AddProcessProg,SaveProcessProg,
@@ -843,4 +909,4 @@ module.exports = {SaveUser,GetUserByEmail,GetGrassRootHome,AddToTeam,
     DoneSubTask,NotDoneSubTask,GetSubProcessCount,GetSubProcessProgCount,GetProcessDocumentsCount,
     GetDocumentsUploadedCount,ChangeProgStatus,GetTeamLeadByEmail,GetDocumentsBySubprocessId,
     GetFinishedProg,GetCurrentlyWorkingProg,GetDataNotStartedProg,GetSubProcessProgress,GetDocumentsNeeded,
-    GetSubProcessByID,GetLastUploadedDoc}
+    GetSubProcessByID,GetLastUploadedDoc,GetTeamLeadData,GetPendingWork}

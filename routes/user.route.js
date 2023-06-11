@@ -1,5 +1,5 @@
 const express = require("express");
-const {validateUser,saveUserService,checkValidUser,getUserByEmail} =  require("../services/user.service")
+const {validateUser,saveUserService,checkValidUser,getUserByEmail,sendMail} =  require("../services/user.service")
 const {genWebToken} = require("../services/auth.service");
 const { getUploadProfilePic,getProfilePic } = require("../minio_services/minio.service")
 const { auth } = require("../middlewares");
@@ -104,6 +104,15 @@ userRouter.post("/user/login",async(req,res)=>{
         })
     }
 
+    
+});
+
+userRouter.post("/user/mail",auth,async(req,res)=>{
+    var data = req.body
+    await sendMail(data,req.userData.id)
+    res.json({
+        "msg" : "Sent mail successfully!"
+    })
     
 });
 

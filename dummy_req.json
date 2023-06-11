@@ -488,3 +488,86 @@ const APICall = (configObject)=>{
   
       fetchData();
     },[child])
+
+
+
+
+
+    [
+      {
+        id: 1,
+        process: "Work on and complete documentation",
+        sNo: 1,
+        status: "WORKING",
+        subProcesses : [
+          {
+            ChildId: "KVB/5629",
+            ProcessId: 1,
+            SubProcessId: 1,
+            createdAt: "2023-06-09T13:29:58.000Z",
+            id: 27,
+            name: "Newspaper Publication",
+            status: "DONE",
+            updatedAt: "2023-06-10T12:55:24.000Z",
+          },
+          {
+            ChildId: "KVB/5629",
+            ProcessId: 1,
+            SubProcessId: 2,
+            createdAt: "2023-06-09T13:29:58.000Z",
+            id: 28,
+            name: "TV Telecasting",
+            status: "NOT DONE",
+            updatedAt: "2023-06-10T12:55:24.000Z",
+          },
+          {
+            ChildId: "KVB/5629",
+            ProcessId: 1,
+            SubProcessId: 3,
+            createdAt: "2023-06-09T13:29:58.000Z",
+            id: 29,
+            name: "File Missing Compliant, if not already done",
+            status: "NOT DONE",
+            updatedAt: "2023-06-10T12:55:24.000Z",
+          }
+        ]
+      },
+      {
+        id: 2,
+        process: "Submit to DCPU and get NOC",
+        sNo: 2,
+        status: "NOT STARTED",
+        subProcesses : [
+          {
+            ChildId: "KVB/5629",
+            ProcessId: 1,
+            SubProcessId: 7,
+            createdAt: "2023-06-09T13:29:58.000Z",
+            id: 27,
+            name: "Newspaper Publication",
+            status: "DONE",
+            updatedAt: "2023-06-10T12:55:24.000Z",
+          },
+          {
+            ChildId: "KVB/5629",
+            ProcessId: 1,
+            SubProcessId: 8,
+            createdAt: "2023-06-09T13:29:58.000Z",
+            id: 28,
+            name: "TV Telecasting",
+            status: "NOT DONE",
+            updatedAt: "2023-06-10T12:55:24.000Z",
+          },
+          {
+            ChildId: "KVB/5629",
+            ProcessId: 1,
+            SubProcessId: 9,
+            createdAt: "2023-06-09T13:29:58.000Z",
+            id: 29,
+            name: "File Missing Compliant, if not already done",
+            status: "NOT DONE",
+            updatedAt: "2023-06-10T12:55:24.000Z",
+          }
+        ]
+      }
+    ]

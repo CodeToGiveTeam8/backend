@@ -50,6 +50,7 @@ childRouter.post("/child/status/edit",auth,async(req,res)=>{
             "msg" : "Invalid Body Request"
         })
     }
+
     if(Status!="NOT STARTED" && Status!="DONE" && Status!="WORKING" && Status!="STOPPED"){
         return res.status(400).json({
             "msg" : "Invalid Body Request"
@@ -61,10 +62,17 @@ childRouter.post("/child/status/edit",auth,async(req,res)=>{
             "msg" : "Invalid Body Request"
         })
     }
-    changed = changeStatus(childId,Status)
-    return res.status(200).json({
-        "msg" : "Updated the status successfully"
-    })
+    changed = await changeStatus(childId,Status)
+    if(changed){
+        return res.status(200).json({
+            "msg" : "Updated the status successfully"
+        })
+    }else{
+        return res.status(400).json({
+            "msg" : "Invalid status change"
+        })
+    }
+    
 })
 
 childRouter.post("/child/image",auth,async(req,res)=>{

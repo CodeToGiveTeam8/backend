@@ -1,4 +1,5 @@
-const {SaveUser,GetUserByEmail,GetGrassRootHome,GetTeamLeadHome,GetTeamLeadByEmail,AddToTeam} = require("../models/repo")
+const {SaveUser,GetUserByEmail,GetGrassRootHome,GetTeamLeadData,GetTeamLeadByEmail,AddToTeam,GetAllChildData,GetPendingWork} = require("../models/repo")
+const nodemailer = require("nodemailer")
 
 const validateUser = (user)=>{
     console.log(user)
@@ -56,17 +57,51 @@ const getUserByEmail = async(email)=>{
 }
 
 const getUserHomeDetails = async(user)=>{
-    console.log(user)
+    // console.log(user)
     if(user.role == "GRASSROOT"){
         //get details only from his cases
         childDetails = await GetGrassRootHome(user.id)
-        console.log(childDetails)
+        // console.log(childDetails)
         return childDetails
-    }else if(user.role == "TEAM LEAD" || user.role == "OPERATION"){
-        //get all data's
-        childDetails = await GetTeamLeadHome()
+    }else if(user.role == "TEAM LEAD"){
+        childDetails = await GetTeamLeadData(user.id)
+        return childDetails
+    }else if(user.role == "OPERATION"){
+        childDetails = await GetAllChildData()
         return childDetails
     }
 }
 
-module.exports = {validateUser,saveUserService,checkValidUser,getUserByEmail,getUserHomeDetails}
+const sendMail = async(body,user_id)=>{
+    const handlebars = require('handlebars');
+    const fs = require('fs');
+
+    console.log(process.cwd())
+    const emailTemplateSource = fs.readFileSync("/Users/suryaprasath/Document/Study/morgan stanley/backend/services/template.hbs", 'utf8');
+    const compiledEmailTemplate = handlebars.compile(emailTemplateSource);
+    const config = {
+        service : "gmail",
+        host : "smtp.gmail.com",
+        port : 587,
+        secure : false,
+        auth : {
+            user : "beckysicky@gmail.com",
+            pass : "kfoagmvtxdfhhrbx"
+        }
+    }
+
+    let mail_body = await GetPendingWork(user_id)
+
+    body.html = compiledEmailTemplate({ child: mail_body })
+
+    const transporter = nodemailer.createTransport(config)
+    transporter.sendMail(body,(err,info)=>{
+        if(err){
+            console.log(err)
+        }else{
+            console.log(info.response)
+        }
+    })
+}
+
+module.exports = {validateUser,saveUserService,checkValidUser,getUserByEmail,getUserHomeDetails,sendMail}
